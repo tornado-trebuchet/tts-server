@@ -1,0 +1,20 @@
+# TTS Server Configuration
+
+tts:
+  # Coqui TTS model identifier
+  # See available models: https://github.com/coqui-ai/TTS#models
+  model_name: "tts_models/en/ljspeech/tacotron2-DDC"
+  # Device: cpu or cuda
+  device: "cpu"
+  # Enable GPU acceleration
+  gpu: false
+
+repository:
+  # Directory to store cloned voice models
+  voices_dir: "~/.cache/tts-server/voices"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  # Enable auto-reload for development
+  reload: false
