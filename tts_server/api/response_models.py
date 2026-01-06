@@ -1,7 +1,6 @@
-"""Pydantic models for API request/response validation."""
-
 from datetime import datetime
 from enum import Enum
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -12,12 +11,6 @@ class AudioFormatEnum(str, Enum):
     WAV = "wav"
     MP3 = "mp3"
     OGG = "ogg"
-
-
-# ============================================================================
-# TTS Request/Response Models
-# ============================================================================
-
 
 class SynthesizeRequest(BaseModel):
     """Request body for text-to-speech synthesis."""
@@ -64,11 +57,6 @@ class LanguagesResponse(BaseModel):
     languages: list[str]
 
 
-# ============================================================================
-# Voice Cloning Request/Response Models
-# ============================================================================
-
-
 class CloneVoiceRequest(BaseModel):
     """Request body for voice cloning (audio samples sent separately)."""
     
@@ -97,7 +85,8 @@ class VoiceResponse(BaseModel):
     description: str
     language: str
     created_at: datetime
-    metadata: dict = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
 
 
 class VoiceListResponse(BaseModel):
@@ -112,11 +101,6 @@ class DeleteVoiceResponse(BaseModel):
     
     success: bool
     message: str
-
-
-# ============================================================================
-# Error Models
-# ============================================================================
 
 
 class ErrorResponse(BaseModel):

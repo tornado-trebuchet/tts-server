@@ -1,8 +1,5 @@
-"""Coqui TTS adapter implementation."""
-
 import asyncio
 import io
-import struct
 import wave
 from collections.abc import AsyncIterator
 from typing import Any
@@ -40,12 +37,12 @@ class CoquiTTSAdapter(TTSPort):
         self.model_name = model_name
         self.device = device
         self.gpu = gpu
-        self._tts: Any = None  # Lazy load TTS model
+        self._tts: Any = None
 
     def _get_tts(self) -> Any:
         """Lazy load the TTS model."""
         if self._tts is None:
-            from TTS.api import TTS  # type: ignore
+            from TTS.api import TTS
             self._tts = TTS(model_name=self.model_name, gpu=self.gpu)
         return self._tts
 
@@ -65,7 +62,11 @@ class CoquiTTSAdapter(TTSPort):
         tts = self._get_tts()
         
         # Synthesize to numpy array
-        wav = tts.tts(text=text, language=language, speaker_wav=speaker_wav)
+        # Only pass language parameter for multi-lingual models
+        tts_kwargs = {"text": text, "speaker_wav": speaker_wav}
+        if tts.is_multi_lingual:
+            tts_kwargs["language"] = language
+        wav = tts.tts(**tts_kwargs)
         
         # Get sample rate from config
         sample_rate = tts.synthesizer.output_sample_rate if hasattr(tts, 'synthesizer') else 22050

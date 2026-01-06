@@ -1,7 +1,5 @@
-"""FastAPI application setup."""
-
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from fastapi import FastAPI
 
@@ -13,32 +11,13 @@ from tts_server.core.di import get_container
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Application lifespan for startup/shutdown tasks.
-    
-    Startup:
-        - Initialize DI container
-        - Pre-load TTS model (optional)
-    
-    Shutdown:
-        - Cleanup resources
-    """
-    # Startup
-    container = get_container()
-    # Optionally pre-load the TTS model here for faster first request
+    get_container()
     # await container.tts_adapter.get_available_voices()
-    
     yield
-    
-    # Shutdown
-    # Add cleanup if needed
 
 
 def create_app() -> FastAPI:
-    """Create and configure FastAPI application.
-    
-    Returns:
-        Configured FastAPI application
-    """
+
     app = FastAPI(
         title="TTS Server",
         description="Local text-to-speech server with voice cloning support",
@@ -53,7 +32,6 @@ def create_app() -> FastAPI:
     app.include_router(tts_router)
     app.include_router(voice_router)
     
-    # Health check endpoint
     @app.get(
         "/health",
         tags=["Health"],
@@ -67,5 +45,4 @@ def create_app() -> FastAPI:
     return app
 
 
-# Application instance for uvicorn
 app = create_app()

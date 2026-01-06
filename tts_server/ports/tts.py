@@ -1,5 +1,3 @@
-"""Port (interface) for TTS adapters."""
-
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 

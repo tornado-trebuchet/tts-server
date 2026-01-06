@@ -1,9 +1,8 @@
 """TTS API router for text-to-speech synthesis."""
 
 from typing import Annotated
-from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from fastapi.responses import Response, StreamingResponse
 
 from tts_server.api.response_models import (
@@ -29,8 +28,8 @@ def get_tts_service() -> TextToSpeechService:
     response_class=Response,
     responses={
         200: {
-            "content": {"audio/wav": {}},
-            "description": "Synthesized audio file",
+            "content": {"audio/wav": {"schema": {"type": "string", "format": "binary"}}},
+            "description": "Synthesized audio file in WAV format",
         }
     },
 )
@@ -63,8 +62,8 @@ async def synthesize(
     response_class=StreamingResponse,
     responses={
         200: {
-            "content": {"audio/wav": {}},
-            "description": "Streaming audio data",
+            "content": {"audio/wav": {"schema": {"type": "string", "format": "binary"}}},
+            "description": "Streaming audio data in WAV format",
         }
     },
 )

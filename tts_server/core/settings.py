@@ -1,5 +1,3 @@
-"""Application settings using Pydantic."""
-
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -9,7 +7,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def yaml_config_settings_source(settings: "Settings") -> dict[str, Any]:
+def yaml_config_settings_source(settings: Any) -> dict[str, Any]:
     """Load settings from config.yml file."""
     config_path = Path("config.yml")
     if config_path.exists():
@@ -41,6 +39,14 @@ class RepositorySettings(BaseSettings):
     voices_dir: str = Field(
         default="~/.cache/tts-server/voices",
         description="Directory to store voice models",
+    )
+    metadata_file: str = Field(
+        default="metadata.json",
+        description="Filename for repository metadata index",
+    )
+    voice_extension: str = Field(
+        default=".voice",
+        description="File extension used for stored voice data",
     )
 
 
@@ -88,7 +94,7 @@ class Settings(BaseSettings):
             init_settings,
             env_settings,
             dotenv_settings,
-            yaml_config_settings_source,
+            lambda: yaml_config_settings_source(cls),
             file_secret_settings,
         )
 

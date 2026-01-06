@@ -1,9 +1,7 @@
-"""Domain models for TTS server - inputs/outputs for ports and persistence."""
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 
@@ -18,7 +16,7 @@ class AudioFormat(str, Enum):
 class TTSRequest:
     """Request for text-to-speech synthesis."""
     text: str
-    voice_id: Optional[UUID] = None  # None = use default voice
+    voice_id: UUID | None = None
     language: str = "en"
     audio_format: AudioFormat = AudioFormat.WAV
     speed: float = 1.0
@@ -41,14 +39,14 @@ class VoiceModel:
     description: str = ""
     language: str = "en"
     created_at: datetime = field(default_factory=datetime.now)
-    file_path: Optional[str] = None  # Path to voice embedding/model file
-    metadata: dict = field(default_factory=dict)  # Adapter-specific metadata
+    file_path: str | None = None 
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class CloneRequest:
     """Request for voice cloning from audio samples."""
     name: str
-    audio_samples: list[bytes]  # Raw audio data from sample files
+    audio_samples: list[bytes]
     description: str = ""
     language: str = "en" 

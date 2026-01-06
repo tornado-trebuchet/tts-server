@@ -3,7 +3,7 @@ name = "tts-server"
 version = "0.1.0"
 description = "Local text-to-speech server with voice cloning support"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
@@ -13,6 +13,7 @@ dependencies = [
     "python-multipart>=0.0.6",
     "TTS>=0.22.0",
     "numpy>=1.26.0",
+    "types-pyyaml>=6.0.12.20250915",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +24,14 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
 ]
+
+gpu = [
+  "torch==2.1.*; sys_platform == 'linux'"
+]
+
+[tool.pip]
+extra-index-url = ["https://download.pytorch.org/whl/cu118"]
+
 
 [project.scripts]
 tts-server = "main:main"
@@ -35,6 +44,6 @@ line-length = 100
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 strict = true
 ignore_missing_imports = true

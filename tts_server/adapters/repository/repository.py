@@ -1,11 +1,9 @@
-"""File-based voice repository with JSON metadata."""
-
 import asyncio
 import json
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from tts_server.domain.models import VoiceModel
@@ -22,18 +20,20 @@ class FileVoiceRepository(VoiceRepositoryPort):
             {uuid}.voice           # Voice embedding/model data
     """
 
-    METADATA_FILE = "metadata.json"
-    VOICE_EXTENSION = ".voice"
+    def __init__(
+        self,
+        voices_dir: Path | str,
+        metadata_file: str,
+        voice_extension: str,
+    ) -> None:
 
-    def __init__(self, voices_dir: Path | str) -> None:
-        """Initialize repository with storage directory.
-        
-        Args:
-            voices_dir: Directory to store voice files and metadata
-        """
         self.voices_dir = Path(voices_dir).expanduser().resolve()
         self.voices_dir.mkdir(parents=True, exist_ok=True)
-        self._metadata_path = self.voices_dir / self.METADATA_FILE
+
+        self._metadata_file = metadata_file
+        self._voice_extension = voice_extension
+
+        self._metadata_path = self.voices_dir / self._metadata_file
         self._ensure_metadata_exists()
 
     def _ensure_metadata_exists(self) -> None:
@@ -43,8 +43,8 @@ class FileVoiceRepository(VoiceRepositoryPort):
 
     def _read_metadata(self) -> dict[str, Any]:
         """Read metadata index from disk."""
-        with open(self._metadata_path, "r") as f:
-            return json.load(f)
+        with open(self._metadata_path) as f:
+            return cast(dict[str, Any], json.load(f))
 
     def _write_metadata(self, metadata: dict[str, Any]) -> None:
         """Write metadata index to disk."""
@@ -53,7 +53,7 @@ class FileVoiceRepository(VoiceRepositoryPort):
 
     def _voice_file_path(self, voice_id: UUID) -> Path:
         """Get path for voice data file."""
-        return self.voices_dir / f"{voice_id}{self.VOICE_EXTENSION}"
+        return self.voices_dir / f"{voice_id}{self._voice_extension}"
 
     def _voice_to_dict(self, voice: VoiceModel) -> dict[str, Any]:
         """Convert VoiceModel to JSON-serializable dict."""
