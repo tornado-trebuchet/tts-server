@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from tts_server.api.audio_router import router as audio_router
 from tts_server.api.response_models import ErrorResponse, HealthResponse
 from tts_server.api.tts_router import router as tts_router
 from tts_server.api.voice_training_router import router as voice_router
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
     # Mount routers
     app.include_router(tts_router)
     app.include_router(voice_router)
+    app.include_router(audio_router)
     
     @app.get(
         "/health",

@@ -1,13 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import AsyncIterator
+from typing import Protocol
 
 from tts_server.domain.models import CloneRequest, TTSRequest, TTSResponse, VoiceModel
 
 
-class TTSPort(ABC):
-    """Abstract base class defining TTS adapter interface.
+class TTSPort(Protocol):
+    """Protocol defining TTS adapter interface.
     
-    All TTS adapters (Coqui, Tortoise, Bark, etc.) must inherit from this class.
+    All TTS adapters (Coqui, Tortoise, Bark, etc.) must implement this protocol.
     """
 
     @abstractmethod

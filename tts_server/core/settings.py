@@ -67,6 +67,27 @@ class ServerSettings(BaseSettings):
     )
 
 
+class AudioSettings(BaseSettings):
+    """Audio playback configuration."""
+    
+    device_index: int | None = Field(
+        default=None,
+        description="Output device index (None = system default)",
+    )
+    buffer_size: int = Field(
+        default=2048,
+        description="Audio buffer size in frames",
+    )
+    default_sample_rate: int = Field(
+        default=22050,
+        description="Default sample rate for audio playback",
+    )
+    default_channels: int = Field(
+        default=1,
+        description="Default number of audio channels",
+    )
+
+
 class Settings(BaseSettings):
     """Root application settings."""
     
@@ -79,6 +100,7 @@ class Settings(BaseSettings):
     tts: TTSSettings = Field(default_factory=TTSSettings)
     repository: RepositorySettings = Field(default_factory=RepositorySettings)
     server: ServerSettings = Field(default_factory=ServerSettings)
+    audio: AudioSettings = Field(default_factory=AudioSettings)
     
     @classmethod
     def settings_customise_sources(

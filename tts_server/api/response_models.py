@@ -115,3 +115,41 @@ class HealthResponse(BaseModel):
     
     status: str = "healthy"
     version: str = "0.1.0"
+
+
+class PlayAudioRequest(BaseModel):
+    """Request body for audio playback."""
+    
+    audio_data: bytes = Field(
+        ...,
+        description="Raw audio bytes (16-bit PCM)",
+    )
+    sample_rate: int = Field(
+        default=22050,
+        description="Sample rate in Hz",
+        ge=8000,
+        le=48000,
+    )
+    channels: int = Field(
+        default=1,
+        description="Number of audio channels",
+        ge=1,
+        le=2,
+    )
+
+
+class PlaybackStatusResponse(BaseModel):
+    """Response for audio playback status."""
+    
+    is_playing: bool
+    duration_seconds: float | None = None
+
+
+class PlayFileRequest(BaseModel):
+    """Request body for playing a WAV file."""
+    
+    file_path: str = Field(
+        ...,
+        description="Absolute path to WAV file",
+        min_length=1,
+    )

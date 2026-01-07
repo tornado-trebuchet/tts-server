@@ -50,3 +50,18 @@ class CloneRequest:
     audio_samples: list[bytes]
     description: str = ""
     language: str = "en" 
+
+
+@dataclass
+class PlaybackRequest:
+    """Request for audio playback on host device."""
+    audio_data: bytes
+    sample_rate: int
+    channels: int = 1
+
+
+@dataclass
+class PlaybackStatus:
+    """Status of audio playback."""
+    is_playing: bool
+    duration_seconds: float | None = None

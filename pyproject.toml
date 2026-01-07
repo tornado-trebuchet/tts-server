@@ -14,6 +14,7 @@ dependencies = [
     "TTS>=0.22.0",
     "numpy>=1.26.0",
     "types-pyyaml>=6.0.12.20250915",
+    "sounddevice>=0.5.3",
 ]
 
 [project.optional-dependencies]
@@ -38,7 +39,7 @@ tts-server = "main:main"
 
 [tool.ruff]
 target-version = "py312"
-line-length = 100
+line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

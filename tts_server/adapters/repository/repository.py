@@ -11,15 +11,6 @@ from tts_server.ports.repository import VoiceRepositoryPort
 
 
 class FileVoiceRepository(VoiceRepositoryPort):
-    """File-based implementation of voice model repository.
-    
-    Stores voice data as individual files with a JSON metadata index.
-    Structure:
-        voices_dir/
-            metadata.json          # Index of all voices
-            {uuid}.voice           # Voice embedding/model data
-    """
-
     def __init__(
         self,
         voices_dir: Path | str,
@@ -37,33 +28,27 @@ class FileVoiceRepository(VoiceRepositoryPort):
         self._ensure_metadata_exists()
 
     def _ensure_metadata_exists(self) -> None:
-        """Create metadata file if it doesn't exist."""
         if not self._metadata_path.exists():
             self._write_metadata({})
 
     def _read_metadata(self) -> dict[str, Any]:
-        """Read metadata index from disk."""
         with open(self._metadata_path) as f:
             return cast(dict[str, Any], json.load(f))
 
     def _write_metadata(self, metadata: dict[str, Any]) -> None:
-        """Write metadata index to disk."""
         with open(self._metadata_path, "w") as f:
             json.dump(metadata, f, indent=2, default=str)
 
     def _voice_file_path(self, voice_id: UUID) -> Path:
-        """Get path for voice data file."""
         return self.voices_dir / f"{voice_id}{self._voice_extension}"
 
     def _voice_to_dict(self, voice: VoiceModel) -> dict[str, Any]:
-        """Convert VoiceModel to JSON-serializable dict."""
         data = asdict(voice)
         data["id"] = str(voice.id)
         data["created_at"] = voice.created_at.isoformat()
         return data
 
     def _dict_to_voice(self, data: dict[str, Any]) -> VoiceModel:
-        """Convert dict back to VoiceModel."""
         return VoiceModel(
             id=UUID(data["id"]),
             name=data["name"],
@@ -75,7 +60,6 @@ class FileVoiceRepository(VoiceRepositoryPort):
         )
 
     async def save(self, voice: VoiceModel, voice_data: bytes) -> VoiceModel:
-        """Save a voice model with its data."""
         voice_id_str = str(voice.id)
         voice_file = self._voice_file_path(voice.id)
         
@@ -108,12 +92,10 @@ class FileVoiceRepository(VoiceRepositoryPort):
         return await asyncio.to_thread(voice_file.read_bytes)
 
     async def list_all(self) -> list[VoiceModel]:
-        """List all stored voice models."""
         metadata = await asyncio.to_thread(self._read_metadata)
         return [self._dict_to_voice(v) for v in metadata.values()]
 
     async def delete(self, voice_id: UUID) -> bool:
-        """Delete a voice model."""
         voice_id_str = str(voice_id)
         metadata = await asyncio.to_thread(self._read_metadata)
         
@@ -132,6 +114,5 @@ class FileVoiceRepository(VoiceRepositoryPort):
         return True
 
     async def exists(self, voice_id: UUID) -> bool:
-        """Check if a voice model exists."""
         metadata = await asyncio.to_thread(self._read_metadata)
         return str(voice_id) in metadata

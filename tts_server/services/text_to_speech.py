@@ -1,5 +1,3 @@
-"""Text-to-speech service orchestrating TTS operations."""
-
 from collections.abc import AsyncIterator
 from uuid import UUID
 
@@ -9,22 +7,11 @@ from tts_server.ports.tts import TTSPort
 
 
 class TextToSpeechService:
-    """Service for text-to-speech synthesis.
-    
-    Orchestrates TTS port and voice repository for synthesis operations.
-    """
-
     def __init__(
         self,
         tts_adapter: TTSPort,
         voice_repository: VoiceRepositoryPort,
     ) -> None:
-        """Initialize service with adapters.
-        
-        Args:
-            tts_adapter: TTS adapter for synthesis
-            voice_repository: Repository for voice model storage
-        """
         self._tts = tts_adapter
         self._voices = voice_repository
 
@@ -92,9 +79,7 @@ class TextToSpeechService:
             yield chunk
 
     async def get_available_voices(self) -> list[str]:
-        """Get list of built-in voices."""
         return await self._tts.get_available_voices()
 
     async def get_supported_languages(self) -> list[str]:
-        """Get list of supported languages."""
         return await self._tts.get_supported_languages()
