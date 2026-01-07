@@ -1,6 +1,7 @@
 # Custom 
 *.wav
 save_audio.sh
+play_audio.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

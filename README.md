@@ -15,9 +15,12 @@ The table below describes the available API endpoints, the expected request body
 | `GET /voices` | None | JSON: `VoiceListResponse` { `voices`: [VoiceResponse], `count`: int } | Lists cloned voices stored in the repository. |
 | `GET /voices/{voice_id}` | None (path param: `voice_id` UUID) | JSON: `VoiceResponse` | Returns the cloned voice by ID. `404 Not Found` if missing. |
 | `DELETE /voices/{voice_id}` | None (path param: `voice_id` UUID) | JSON: `DeleteVoiceResponse` { `success`: bool, `message`: string } | Deletes the cloned voice. `404 Not Found` if missing. |
+| `POST /audio/play-bytes` | JSON: `PlayAudioRequest` { `audio_data` (bytes, required), `sample_rate` (int, default: 22050), `channels` (int, default: 1) } | JSON: `PlaybackStatusResponse` { `is_playing`: bool, `duration_seconds`: float|null } | Plays raw 16-bit PCM audio through host speakers. Blocks until complete. |
+| `POST /audio/play-file` | JSON: `PlayFileRequest` { `file_path` (string, required) } | JSON: `PlaybackStatusResponse` | Plays WAV file from absolute path. `400` if invalid path/extension, `404` if not found. |
+| `POST /audio/stop` | None | JSON: `PlaybackStatusResponse` | Stops current playback immediately. |
+| `GET /audio/status` | None | JSON: `PlaybackStatusResponse` | Returns current playback status. |
 | `GET /health` | None | JSON: `HealthResponse` { `status`: string, `version`: string } | Simple health check. |
 
 
-
-
-# Notes default port: 1644
+# Notes 
+Default port: 1644
