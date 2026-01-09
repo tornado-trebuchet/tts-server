@@ -1,5 +1,5 @@
 from tts_server.adapters.audio.sounddevice import SoundDevicePlaybackAdapter
-from tts_server.adapters.repository.repository import FileVoiceRepository
+from tts_server.adapters.repository.filesystem import FileVoiceRepository
 from tts_server.adapters.tts.coqui import CoquiTTSAdapter
 from tts_server.core.settings import Settings, get_settings
 from tts_server.ports.audio import AudioPlaybackPort
