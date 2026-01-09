@@ -5,10 +5,6 @@ from tts_server.domain.models import PlaybackRequest, PlaybackStatus
 
 
 class AudioPlaybackPort(Protocol):
-    """Protocol defining audio playback interface.
-    
-    Implementations handle playing audio through system speakers.
-    """
 
     @abstractmethod
     async def play(self, request: PlaybackRequest) -> PlaybackStatus:

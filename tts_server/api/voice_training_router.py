@@ -1,5 +1,3 @@
-"""Voice training API router for voice cloning operations."""
-
 from typing import Annotated
 from uuid import UUID
 
@@ -11,7 +9,7 @@ from tts_server.api.response_models import (
     VoiceResponse,
 )
 from tts_server.core.di import get_container
-from tts_server.services.clone_speech import CloneSpeechService
+from tts_server.services.clone_voice import CloneSpeechService
 
 router = APIRouter(prefix="/voices", tags=["Voice Cloning"])
 

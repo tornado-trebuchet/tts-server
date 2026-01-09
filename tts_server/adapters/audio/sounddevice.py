@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import wave
 from pathlib import Path
 from threading import Lock
@@ -22,20 +23,38 @@ class SoundDevicePlaybackAdapter(AudioPlaybackPort):
     def _play_sync(self, audio_array: np.ndarray[Any, Any], sample_rate: int) -> float:
         with self._lock:
             self._is_playing = True
-        
         try:
-            sd.play( # type: ignore 
+            device = self._resolve_output_device()
+            sd.play(  # type: ignore
                 audio_array,
                 samplerate=sample_rate,
-                device=self._settings.device_index,
+                device=device,
                 blocksize=self._settings.buffer_size,
             )
-            sd.wait() # type: ignore 
+            sd.wait()  # type: ignore
             duration = len(audio_array) / sample_rate
             return duration
         finally:
             with self._lock:
                 self._is_playing = False
+
+    def _resolve_output_device(self) -> int | None:
+        logger = logging.getLogger(__name__)
+        if self._settings.device_index is not None:
+            logger.debug("Using configured audio device index: %s", self._settings.device_index)
+            return self._settings.device_index
+
+        try:
+            for i, d in enumerate(sd.query_devices()): # type: ignore
+                name = str(d.get("name", "")).lower() 
+                if "pulse" in name or "pipewire" in name:
+                    logger.debug("Found pulse/pipewire device: %s (index=%d)", d.get("name"), i)
+                    return i
+        except Exception:
+            logger.exception("Error querying sounddevice devices")
+
+        logger.debug("No pulse/pipewire device found, using system default")
+        return None
 
     def _load_wav_file(self, file_path: str) -> tuple[np.ndarray[Any, Any], int, int]:
         path = Path(file_path)
@@ -70,7 +89,7 @@ class SoundDevicePlaybackAdapter(AudioPlaybackPort):
         return audio_float, sample_rate, channels
 
     def _parse_audio_data(self, request: PlaybackRequest) -> np.ndarray[Any, Any]:
-        # Assume 16-bit PCM audio
+        # Parse 16-bit PCM audio data
         audio_int16 = np.frombuffer(request.audio_data, dtype=np.int16)
         
         # Reshape for multi-channel if needed

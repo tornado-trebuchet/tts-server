@@ -22,5 +22,12 @@ The table below describes the available API endpoints, the expected request body
 | `GET /health` | None | JSON: `HealthResponse` { `status`: string, `version`: string } | Simple health check. |
 
 
+# API you actually want to use 
+| Path | Request Body | Response | Notes |
+|------|--------------|----------|-------|
+| `WS /ws/synth-play` | JSON: { `text` (string, required), `voice_id` (UUID|null), `language` (string, default: "en") } | JSON messages: { `state`: string, `message`: string|null, `duration_seconds`: float|null, `error`: string|null } | WebSocket endpoint. Synthesizes text and plays audio on host. Sends state transitions: `synthesizing` → `playing` → `completed`. Connection closes after playback. |
+
+
 # Notes 
 Default port: 1644
+Uing pulse backend for audio 

@@ -1,8 +1,6 @@
 import asyncio
-import io
 import os
 import tempfile
-import wave
 from collections.abc import AsyncIterator
 from typing import Any
 from uuid import uuid4
@@ -32,11 +30,21 @@ class CoquiTTSAdapter(TTSPort):
         self.gpu = gpu
         self.tts: Any = TTS(model_name=self.model_name, gpu=self.gpu)
 
+    def _normalize(self, text: str) -> str:
+        normalized = text.encode("ascii", errors="ignore").decode("ascii")
+        normalized = " ".join(normalized.split())
+        
+        return normalized.strip()
 
     def _synthesize_sync(
         self, text: str, language: str, speaker_wav: str | None = None
     ) -> tuple[bytes, int]:
-        tts_kwargs = {"text": text, "speaker_wav": speaker_wav}
+        normalized_text = self._normalize(text)
+        
+        if not normalized_text:
+            raise ValueError("Text is empty after normalization (contains only unsupported characters)")
+        
+        tts_kwargs = {"text": normalized_text, "speaker_wav": speaker_wav}
         if self.tts.is_multi_lingual:
             tts_kwargs["language"] = language
         wav = self.tts.tts(**tts_kwargs)
@@ -45,29 +53,23 @@ class CoquiTTSAdapter(TTSPort):
             sample_rate = self.tts.synthesizer.output_sample_rate
         else:
             sample_rate = 22050
-        audio_bytes = self._numpy_to_wav_bytes(wav, sample_rate)
+        audio_bytes = self._numpy_to_pcm_bytes(wav)
         
         return audio_bytes, sample_rate
 
-    def _numpy_to_wav_bytes(self, wav_array: Any, sample_rate: int) -> bytes:
-        
+    def _numpy_to_pcm_bytes(self, wav_array: Any) -> bytes:
+        """Convert numpy array to raw 16-bit PCM bytes."""
         wav_array = np.array(wav_array)
         if wav_array.max() <= 1.0:
             wav_array = wav_array * 32767
         wav_array = wav_array.astype(np.int16)
         
-        buffer = io.BytesIO()
-        with wave.open(buffer, 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2) 
-            wf.setframerate(sample_rate)
-            wf.writeframes(wav_array.tobytes())
-        
-        return buffer.getvalue()
+        result: bytes = wav_array.tobytes()
+        return result
 
     def _calculate_duration(self, audio_bytes: bytes, sample_rate: int) -> float:
-        data_size = len(audio_bytes) - 44
-        num_samples = data_size // 2
+        """Calculate audio duration from raw PCM bytes."""
+        num_samples = len(audio_bytes) // 2  # 2 bytes per sample (int16)
         return num_samples / sample_rate
 
     async def synthesize(
@@ -89,6 +91,7 @@ class CoquiTTSAdapter(TTSPort):
             audio_format=AudioFormat.WAV,
             sample_rate=sample_rate,
             duration_seconds=duration,
+            channels=1,
         )
 
     # TODO: implement 

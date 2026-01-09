@@ -1,5 +1,3 @@
-"""TTS API router for text-to-speech synthesis."""
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -24,12 +22,12 @@ def get_tts_service() -> TextToSpeechService:
 @router.post(
     "/synthesize",
     summary="Synthesize speech from text",
-    description="Generate audio from text using TTS. Returns WAV audio.",
+    description="Generate audio from text using TTS. Returns raw 16-bit PCM audio.",
     response_class=Response,
     responses={
         200: {
-            "content": {"audio/wav": {"schema": {"type": "string", "format": "binary"}}},
-            "description": "Synthesized audio file in WAV format",
+            "content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}},
+            "description": "Synthesized audio as raw 16-bit PCM",
         }
     },
 )
@@ -47,10 +45,12 @@ async def synthesize(
     
     return Response(
         content=response.audio_data,
-        media_type="audio/wav",
+        media_type="application/octet-stream",
         headers={
             "X-Audio-Duration": str(response.duration_seconds),
             "X-Sample-Rate": str(response.sample_rate),
+            "X-Channels": str(response.channels),
+            "X-Audio-Format": "pcm_s16le",
         },
     )
 
@@ -58,12 +58,12 @@ async def synthesize(
 @router.post(
     "/synthesize/stream",
     summary="Stream synthesized speech",
-    description="Generate audio from text with streaming response.",
+    description="Generate audio from text with streaming response. Returns raw 16-bit PCM audio chunks.",
     response_class=StreamingResponse,
     responses={
         200: {
-            "content": {"audio/wav": {"schema": {"type": "string", "format": "binary"}}},
-            "description": "Streaming audio data in WAV format",
+            "content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}},
+            "description": "Streaming raw 16-bit PCM audio data",
         }
     },
 )
@@ -81,7 +81,7 @@ async def synthesize_stream(
     
     return StreamingResponse(
         content=audio_stream,
-        media_type="audio/wav",
+        media_type="application/octet-stream",
     )
 
 

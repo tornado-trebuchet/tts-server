@@ -2,14 +2,10 @@ from abc import abstractmethod
 from collections.abc import AsyncIterator
 from typing import Protocol
 
-from tts_server.domain.models import CloneRequest, TTSRequest, TTSResponse, VoiceModel
+from tts_server.domain.models import TTSRequest, TTSResponse, VoiceModel
 
 
 class TTSPort(Protocol):
-    """Protocol defining TTS adapter interface.
-    
-    All TTS adapters (Coqui, Tortoise, Bark, etc.) must implement this protocol.
-    """
 
     @abstractmethod
     async def synthesize(self, request: TTSRequest, voice: VoiceModel | None = None) -> TTSResponse:
@@ -36,18 +32,6 @@ class TTSPort(Protocol):
             
         Yields:
             Audio data chunks as bytes
-        """
-        ...
-
-    @abstractmethod
-    async def clone_voice(self, request: CloneRequest) -> VoiceModel:
-        """Create a cloned voice from audio samples.
-        
-        Args:
-            request: Clone request with audio samples and metadata
-            
-        Returns:
-            Created voice model (without persistence - that's repository's job)
         """
         ...
 

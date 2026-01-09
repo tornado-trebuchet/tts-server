@@ -1,5 +1,3 @@
-"""Audio API router for audio playback on host device."""
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status

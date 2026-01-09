@@ -29,6 +29,7 @@ class TTSResponse:
     audio_format: AudioFormat
     sample_rate: int
     duration_seconds: float
+    channels: int = 1
 
 
 @dataclass
@@ -65,3 +66,28 @@ class PlaybackStatus:
     """Status of audio playback."""
     is_playing: bool
     duration_seconds: float | None = None
+
+
+class SynthPlayState(str, Enum):
+    """State transitions for synthesize + playback flow."""
+    SYNTHESIZING = "synthesizing"
+    PLAYING = "playing"
+    COMPLETED = "completed"
+    ERROR = "error"
+
+
+@dataclass
+class SynthPlayRequest:
+    """Request for synthesize + playback via WebSocket."""
+    text: str
+    voice_id: UUID | None = None
+    language: str = "en"
+
+
+@dataclass
+class SynthPlayMessage:
+    """WebSocket message for state updates."""
+    state: SynthPlayState
+    message: str | None = None
+    duration_seconds: float | None = None
+    error: str | None = None

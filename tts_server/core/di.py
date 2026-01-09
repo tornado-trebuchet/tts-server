@@ -3,10 +3,12 @@ from tts_server.adapters.repository.repository import FileVoiceRepository
 from tts_server.adapters.tts.coqui import CoquiTTSAdapter
 from tts_server.core.settings import Settings, get_settings
 from tts_server.ports.audio import AudioPlaybackPort
+from tts_server.ports.clone_voice import VoiceCloningPort
 from tts_server.ports.repository import VoiceRepositoryPort
 from tts_server.ports.tts import TTSPort
 from tts_server.services.audio_playback import AudioPlaybackService
-from tts_server.services.clone_speech import CloneSpeechService
+from tts_server.services.clone_voice import CloneSpeechService
+from tts_server.services.synth_play import SynthPlayService
 from tts_server.services.text_to_speech import TextToSpeechService
 
 
@@ -19,6 +21,15 @@ def get_voice_repository(settings: Settings | None = None) -> VoiceRepositoryPor
         voice_extension=settings.repository.voice_extension,
     )
 
+def get_vc_adapter(settings: Settings | None = None) -> VoiceCloningPort: 
+    if settings is None:
+        settings = get_settings()
+    # TODO: Wire to the separated one
+    return CoquiTTSAdapter(
+        model_name=settings.tts.model_name,
+        device=settings.tts.device,
+        gpu=settings.tts.gpu,
+    )
 
 def get_tts_adapter(settings: Settings | None = None) -> TTSPort:
     if settings is None:
@@ -45,15 +56,15 @@ def get_tts_service(
 
 
 def get_clone_service(
-    tts_adapter: TTSPort | None = None,
+    vc_adapter: VoiceCloningPort | None = None,
     voice_repository: VoiceRepositoryPort | None = None,
 ) -> CloneSpeechService:
-    if tts_adapter is None:
-        tts_adapter = get_tts_adapter()
+    if vc_adapter is None:
+        vc_adapter = get_vc_adapter()
     if voice_repository is None:
         voice_repository = get_voice_repository()
     return CloneSpeechService(
-        tts_adapter=tts_adapter,
+        tts_adapter=vc_adapter,
         voice_repository=voice_repository,
     )
 
@@ -79,38 +90,42 @@ class Container:
     
     @property
     def settings(self) -> Settings:
-        """Get application settings."""
         return self._settings
     
     @property
     def voice_repository(self) -> VoiceRepositoryPort:
-        """Get voice repository instance."""
         return get_voice_repository(self._settings)
     
     @property
     def tts_adapter(self) -> TTSPort:
-        """Get TTS adapter instance."""
         return get_tts_adapter(self._settings)
     
     @property
+    def vc_adapter(self) -> VoiceCloningPort:
+        return get_vc_adapter(self._settings)
+
+    @property
     def tts_service(self) -> TextToSpeechService:
-        """Get TTS service instance."""
         return get_tts_service(self.tts_adapter, self.voice_repository)
     
     @property
     def clone_service(self) -> CloneSpeechService:
-        """Get voice cloning service instance."""
-        return get_clone_service(self.tts_adapter, self.voice_repository)
+        return get_clone_service(self.vc_adapter, self.voice_repository)
     
     @property
     def audio_adapter(self) -> AudioPlaybackPort:
-        """Get audio playback adapter instance."""
         return get_audio_adapter(self._settings)
     
     @property
     def audio_service(self) -> AudioPlaybackService:
-        """Get audio playback service instance."""
         return get_audio_service(self.audio_adapter)
+
+    @property
+    def synth_play_service(self) -> SynthPlayService:
+        return SynthPlayService(
+            tts_adapter=self.tts_adapter,
+            audio_adapter=self.audio_adapter,
+        )
 
 
 _container: Container | None = None

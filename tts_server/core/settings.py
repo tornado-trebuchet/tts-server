@@ -8,7 +8,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def yaml_config_settings_source(settings: Any) -> dict[str, Any]:
-    """Load settings from config.yml file."""
     config_path = Path("config.yml")
     if config_path.exists():
         with open(config_path) as f:
@@ -16,9 +15,7 @@ def yaml_config_settings_source(settings: Any) -> dict[str, Any]:
     return {}
 
 
-class TTSSettings(BaseSettings):
-    """TTS adapter configuration."""
-    
+class TTSSettings(BaseSettings):    
     model_name: str = Field(
         default="tts_models/en/ljspeech/tacotron2-DDC",
         description="Coqui TTS model identifier",
@@ -34,7 +31,6 @@ class TTSSettings(BaseSettings):
 
 
 class RepositorySettings(BaseSettings):
-    """Voice repository configuration."""
     
     voices_dir: str = Field(
         default="~/.cache/tts-server/voices",
@@ -51,7 +47,6 @@ class RepositorySettings(BaseSettings):
 
 
 class ServerSettings(BaseSettings):
-    """HTTP server configuration."""
     
     host: str = Field(
         default="0.0.0.0",
@@ -68,7 +63,6 @@ class ServerSettings(BaseSettings):
 
 
 class AudioSettings(BaseSettings):
-    """Audio playback configuration."""
     
     device_index: int | None = Field(
         default=None,
@@ -89,7 +83,6 @@ class AudioSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-    """Root application settings."""
     
     model_config = SettingsConfigDict(
         env_prefix="TTS_",
@@ -121,11 +114,6 @@ class Settings(BaseSettings):
         )
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Get cached application settings.
-    
-    Returns:
-        Settings loaded from config.yml and environment variables.
-    """
     return Settings()

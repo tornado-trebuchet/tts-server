@@ -1,12 +1,9 @@
-"""TTS Server entry point."""
-
 import uvicorn
 
 from tts_server.core.settings import get_settings
 
 
 def main() -> None:
-    """Run the TTS server with uvicorn."""
     settings = get_settings()
     
     uvicorn.run(

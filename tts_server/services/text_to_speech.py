@@ -18,21 +18,11 @@ class TextToSpeechService:
     async def synthesize(
         self,
         text: str,
+        language: str,
+        speed: float,
         voice_id: UUID | None = None,
-        language: str = "en",
-        speed: float = 1.0,
     ) -> TTSResponse:
-        """Synthesize speech from text.
-        
-        Args:
-            text: Text to synthesize
-            voice_id: Optional UUID of cloned voice to use
-            language: Language code
-            speed: Speech speed multiplier
-            
-        Returns:
-            Audio response with synthesized speech
-        """
+
         voice: VoiceModel | None = None
         if voice_id:
             voice = await self._voices.get(voice_id)
@@ -49,21 +39,11 @@ class TextToSpeechService:
     async def synthesize_stream(
         self,
         text: str,
+        language: str,
+        speed: float,
         voice_id: UUID | None = None,
-        language: str = "en",
-        speed: float = 1.0,
     ) -> AsyncIterator[bytes]:
-        """Stream synthesized speech.
-        
-        Args:
-            text: Text to synthesize
-            voice_id: Optional UUID of cloned voice to use
-            language: Language code
-            speed: Speech speed multiplier
-            
-        Yields:
-            Audio chunks as bytes
-        """
+
         voice: VoiceModel | None = None
         if voice_id:
             voice = await self._voices.get(voice_id)

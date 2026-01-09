@@ -6,10 +6,6 @@ from tts_server.domain.models import VoiceModel
 
 
 class VoiceRepositoryPort(Protocol):
-    """Protocol defining voice model persistence interface.
-    
-    Implementations handle storage of cloned voice models.
-    """
 
     @abstractmethod
     async def save(self, voice: VoiceModel, voice_data: bytes) -> VoiceModel:

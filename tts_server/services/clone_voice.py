@@ -1,14 +1,15 @@
 from uuid import UUID
 
 from tts_server.domain.models import CloneRequest, VoiceModel
+from tts_server.ports.clone_voice import VoiceCloningPort
 from tts_server.ports.repository import VoiceRepositoryPort
-from tts_server.ports.tts import TTSPort
 
 
 class CloneSpeechService:
+
     def __init__(
         self,
-        tts_adapter: TTSPort,
+        tts_adapter: VoiceCloningPort,
         voice_repository: VoiceRepositoryPort,
     ) -> None:
         
@@ -22,17 +23,7 @@ class CloneSpeechService:
         description: str = "",
         language: str = "en",
     ) -> VoiceModel:
-        """Create and store a cloned voice.
-        
-        Args:
-            name: Name for the voice
-            audio_samples: Audio sample files as bytes
-            description: Voice description
-            language: Language code
-            
-        Returns:
-            Created and persisted voice model
-        """
+
         request = CloneRequest(
             name=name,
             audio_samples=audio_samples,
