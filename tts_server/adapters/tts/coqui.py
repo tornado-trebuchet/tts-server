@@ -6,7 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 import numpy as np
-from TTS.api import TTS
+from TTS.api import TTS  # type: ignore
 
 from tts_server.domain.models import (
     AudioFormat,
@@ -22,11 +22,9 @@ class CoquiTTSAdapter(TTSPort):
     def __init__(
         self,
         model_name: str,
-        device: str,
         gpu: bool,
     ) -> None:
         self.model_name = model_name
-        self.device = device
         self.gpu = gpu
         self.tts: Any = TTS(model_name=self.model_name, gpu=self.gpu)
 

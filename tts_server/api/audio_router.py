@@ -14,7 +14,6 @@ router = APIRouter(prefix="/audio", tags=["Audio Playback"])
 
 
 def get_audio_service() -> AudioPlaybackService:
-    """Dependency to get audio playback service."""
     return get_container().audio_service
 
 

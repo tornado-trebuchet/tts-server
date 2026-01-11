@@ -29,7 +29,6 @@ def create_app() -> FastAPI:
         },
     )
     
-    # Mount routers
     app.include_router(main_router)
     app.include_router(tts_router)
     app.include_router(voice_router)

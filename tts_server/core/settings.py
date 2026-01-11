@@ -20,10 +20,7 @@ class TTSSettings(BaseSettings):
         default="tts_models/en/ljspeech/tacotron2-DDC",
         description="Coqui TTS model identifier",
     )
-    device: str = Field(
-        default="cpu",
-        description="Device to run on (cpu or cuda)",
-    )
+    
     gpu: bool = Field(
         default=False,
         description="Whether to use GPU acceleration",

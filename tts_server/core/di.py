@@ -27,7 +27,6 @@ def get_vc_adapter(settings: Settings | None = None) -> VoiceCloningPort:
     # TODO: Wire to the separated one
     return CoquiTTSAdapter(
         model_name=settings.tts.model_name,
-        device=settings.tts.device,
         gpu=settings.tts.gpu,
     )
 
@@ -36,7 +35,6 @@ def get_tts_adapter(settings: Settings | None = None) -> TTSPort:
         settings = get_settings()
     return CoquiTTSAdapter(
         model_name=settings.tts.model_name,
-        device=settings.tts.device,
         gpu=settings.tts.gpu,
     )
 

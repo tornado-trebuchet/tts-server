@@ -1,6 +1,5 @@
 tts:
   model_name: "tts_models/en/ljspeech/tacotron2-DDC"
-  device: "cuda"
   gpu: true
 
 repository:
